@@ -6689,7 +6689,7 @@ function toggleFavorite(li, si, vi) {
 // ─── SPEECH ───
 // ── AZURE TTS ──────────────────────────────────────────────────────────────
 // Update AZURE_WORKER_URL after deploying the Cloudflare Worker
-const APP_VERSION = 'EverydayChinese v2.6';
+const APP_VERSION = 'EverydayChinese v2.7';
 const AZURE_WORKER_URL = 'https://medchinese-tts.medrosettaapp.workers.dev';
 const VOICE_MAP = {
   yue: localStorage.getItem('everyday_azure_voice_yue') || 'zh-HK-HiuGaaiNeural',
@@ -8829,7 +8829,7 @@ function renderSetupPage() {
   renderAudioSetup(target);
   // Version at bottom
   const vbanner = document.createElement('div');
-  vbanner.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;padding:16px 0 8px 0;border-top:1px solid var(--border);margin-top:24px;color:var(--muted)"><span style="color:var(--gold);font-weight:700">EverydayChinese v2.6</span> &nbsp;·&nbsp; May 31, 2026</div>`;
+  vbanner.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;padding:16px 0 8px 0;border-top:1px solid var(--border);margin-top:24px;color:var(--muted)"><span style="color:var(--gold);font-weight:700">EverydayChinese v2.7</span> &nbsp;·&nbsp; May 31, 2026</div>`;
   // API key for Photo Hunt
   const apiSection = document.createElement('div');
   apiSection.style.cssText = 'margin-top:20px;padding-top:20px;border-top:1px solid var(--border)';
