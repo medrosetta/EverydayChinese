@@ -7691,13 +7691,24 @@ function renderVocab() {
                 <div class="vocab-zh">${v.zh}</div>
                 <div class="vocab-jyutping" title="${currentLang === 'cmn' ? 'Pinyin' : 'Jyutping'}">${v.jp}</div>
                 <div class="vocab-en">${v.en}</div>
-                <div class="thumb-bar" data-zh="${v.zh}" data-en="${v.en}"><button class="thumb-btn" title="Useful" onclick="thumbVocabEl(this,'up')">👍</button><button class="thumb-btn" title="Not useful" onclick="thumbVocabEl(this,'down')">👎</button><button class="flag-btn" title="Report an error" onclick="event.stopPropagation();openFeedbackEl(this)">💬</button><button class="fav-btn ${isStarred?'starred':''}" id="fbtn-${cur}-${si}-${vi}" onclick="event.stopPropagation();toggleFavorite(${cur},${si},${vi})" title="${isStarred?'Remove from favorites':'Add to favorites'}">${isStarred?'★':'☆'}</button><label class="thumb-btn photo-hunt-btn" title="Photo Hunt — photograph this word" id="phbtn-${si}-${vi}" for="phfile-${si}-${vi}" onclick="event.stopPropagation();phCheckKey('${si}-${vi}')" style="cursor:pointer">📷</label><input type="file" id="phfile-${si}-${vi}" accept="image/*" capture="environment" data-zh="${v.zh}" data-en="${v.en}" data-card="${si}-${vi}" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none" onchange="vcardPhotoInput(this)"></div>
+                <div class="thumb-bar" data-zh="${v.zh}" data-en="${v.en}"><button class="thumb-btn" title="Useful" onclick="thumbVocabEl(this,'up')">👍</button><button class="thumb-btn" title="Not useful" onclick="thumbVocabEl(this,'down')">👎</button><button class="flag-btn" title="Report an error" onclick="event.stopPropagation();openFeedbackEl(this)">💬</button><button class="fav-btn ${isStarred?'starred':''}" id="fbtn-${cur}-${si}-${vi}" onclick="event.stopPropagation();toggleFavorite(${cur},${si},${vi})" title="${isStarred?'Remove from favorites':'Add to favorites'}">${isStarred?'★':'☆'}</button><label class="thumb-btn photo-hunt-btn" title="Photo Hunt — photograph this word" id="phbtn-${si}-${vi}" for="phfile-${si}-${vi}" onclick="event.stopPropagation();phCheckKey('${si}-${vi}')" style="cursor:pointer">📷</label><input type="file" id="phfile-${si}-${vi}" accept="image/*" data-zh="${v.zh}" data-en="${v.en}" data-card="${si}-${vi}" style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"></div>
               </div>`;}).join('')}
           </div>
         </div>
       </div>`;
   });
   document.getElementById('tab-content').innerHTML = html;
+
+  // Attach photo input listeners after DOM insert (iOS Safari requires addEventListener, not inline onchange)
+  setTimeout(function() {
+    document.querySelectorAll('input[id^="phfile-"]').forEach(function(inp) {
+      var clone = inp.cloneNode(true);
+      inp.parentNode.replaceChild(clone, inp);
+      clone.addEventListener('change', function() {
+        if (window.vcardPhotoInput) window.vcardPhotoInput(this);
+      });
+    });
+  }, 150);
 }
 
 function toggleSection(si) {
@@ -8818,7 +8829,7 @@ function renderSetupPage() {
   renderAudioSetup(target);
   // Version at bottom
   const vbanner = document.createElement('div');
-  vbanner.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;padding:16px 0 8px 0;border-top:1px solid var(--border);margin-top:24px;color:var(--muted)"><span style="color:var(--gold);font-weight:700">EverydayChinese v2.6</span> &nbsp;·&nbsp; May 30, 2026</div>`;
+  vbanner.innerHTML = `<div style="font-family:'DM Mono',monospace;font-size:0.65rem;letter-spacing:0.12em;padding:16px 0 8px 0;border-top:1px solid var(--border);margin-top:24px;color:var(--muted)"><span style="color:var(--gold);font-weight:700">EverydayChinese v2.6</span> &nbsp;·&nbsp; May 31, 2026</div>`;
   // API key for Photo Hunt
   const apiSection = document.createElement('div');
   apiSection.style.cssText = 'margin-top:20px;padding-top:20px;border-top:1px solid var(--border)';
@@ -10157,7 +10168,7 @@ function phCheckKey(cardId) {
   // If key exists, do nothing — label naturally opens file picker
 }
 
-async function vcardPhotoInput(input) {
+window.vcardPhotoInput = async function vcardPhotoInput(input) {
   const file = input.files[0];
   if (!file) return;
   const zh = input.dataset.zh || '';
@@ -10448,18 +10459,16 @@ function runPhotoHuntGame(pool) {
           style="display:inline-block;font-family:'DM Mono',monospace;font-size:0.78rem;letter-spacing:0.08em;background:var(--teal);color:#fff;padding:14px 36px;cursor:pointer;border-radius:4px">
           📷 &nbsp;TAKE PHOTO 影相
         </label>
-        <input type="file" id="ph-cam-input" accept="image/*" capture="environment"
+        <input type="file" id="ph-cam-input" accept="image/*"
           data-zh="${v.zh}" data-en="${v.en}"
-          style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
-          onchange="phHandlePhotoInput(this)">
-        <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);margin-top:8px">Photo saves to your Camera Roll · Claude just checks it</div>
+          style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
+        <div style="font-family:'DM Mono',monospace;font-size:0.58rem;color:var(--muted);margin-top:8px">iOS: choose Camera to save to Roll, or pick from Library</div>
       </div>
       <div style="text-align:center;margin-bottom:16px">
         <label for="ph-lib-input" style="font-family:'DM Mono',monospace;font-size:0.6rem;color:var(--muted);cursor:pointer;text-decoration:underline">or choose from photo library</label>
         <input type="file" id="ph-lib-input" accept="image/*"
           data-zh="${v.zh}" data-en="${v.en}"
-          style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none"
-          onchange="phHandlePhotoInput(this)">
+          style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none">
       </div>
 
       <div id="ph-result"></div>
@@ -10470,12 +10479,24 @@ function runPhotoHuntGame(pool) {
       </div>`;
 
     window.phSkipCard = function() { idx++; showCard(); };
-    // Re-expose showCard for Next button in result
     window._phShowCard = showCard;
     window._phPool = pool;
     window._phIdx = () => idx;
     window._phScore = () => score;
     window._phAdvance = function(matched) { if (matched) score++; idx++; showCard(); };
+
+    // Attach file input listeners AFTER DOM insertion (iOS Safari requires this)
+    ['ph-cam-input','ph-lib-input'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        // Remove any stale listener then add fresh one
+        el.replaceWith(el.cloneNode(true));
+        const fresh = document.getElementById(id);
+        if (fresh) fresh.addEventListener('change', function() {
+          window.phHandlePhotoInput(this);
+        });
+      }
+    });
   }
 
   function showResult() {
